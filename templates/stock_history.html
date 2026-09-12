@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% set active_page = 'stock' %}
+{% block title %}Stock history{% endblock %}
+{% block page_title %}Stock movement history{% endblock %}
+{% block page_sub %}<p>Every stock in, stock out and sale, in order</p>{% endblock %}
+
+{% block content %}
+
+<form class="filters-row" method="get">
+  <select name="product" onchange="this.form.submit()">
+    <option value="">All products</option>
+    {% for p in products %}
+    <option value="{{ p.id }}" {{ 'selected' if selected_product|string == p.id|string }}>{{ p.name }}</option>
+    {% endfor %}
+  </select>
+  {% if selected_product %}<a class="btn btn-ghost btn-sm" href="{{ url_for('stock_history') }}">Clear</a>{% endif %}
+  <a class="btn btn-outline btn-sm" style="margin-left:auto;" href="{{ url_for('stock') }}">← Back to stock ledger</a>
+</form>
+
+<div class="card">
+  {% if movements|length > 0 %}
+  <div class="table-wrap">
+    <table class="ledger">
+      <thead><tr><th>When</th><th>Product</th><th>Type</th><th class="num">Qty</th><th class="num">Before</th><th class="num">After</th><th>Note</th></tr></thead>
+      <tbody>
+        {% for m in movements %}
+        <tr>
+          <td class="muted">{{ m.created_at }}</td>
+          <td class="row-title">{{ m.product_name }}</td>
+          <td>
+            {% if m.movement_type == 'IN' %}<span class="badge badge-teal dot-before">In</span>
+            {% elif m.movement_type == 'OUT' %}<span class="badge badge-neutral dot-before">Out</span>
+            {% else %}<span class="badge badge-warn dot-before">Sale</span>{% endif %}
+          </td>
+          <td class="num">{{ m.quantity }}</td>
+          <td class="num muted">{{ m.previous_stock }}</td>
+          <td class="num">{{ m.new_stock }}</td>
+          <td class="muted">{{ m.note or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="mark"><span></span><span></span><span></span><span></span><span></span></div>
+    <h4>No movements recorded</h4>
+    <p>Stock in / out actions and sales will appear here.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

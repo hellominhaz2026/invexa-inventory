@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_sub %}<p>Today at a glance</p>{% endblock %}
+
+{% block content %}
+
+<div class="ticker">
+  <div class="ticker-cell accent-top">
+    <div class="t-label">Total revenue</div>
+    <div class="t-value">৳{{ "{:,.0f}".format(total_revenue) }}</div>
+    <div class="t-sub">Across {{ total_sales }} sale{{ 's' if total_sales != 1 }}</div>
+  </div>
+  <div class="ticker-cell">
+    <div class="t-label">Products</div>
+    <div class="t-value">{{ total_products }}</div>
+    <div class="t-sub">SKUs in catalog</div>
+  </div>
+  <div class="ticker-cell">
+    <div class="t-label">Stock value</div>
+    <div class="t-value">৳{{ "{:,.0f}".format(stock_value) }}</div>
+    <div class="t-sub">At purchase cost</div>
+  </div>
+  <div class="ticker-cell">
+    <div class="t-label">Customers</div>
+    <div class="t-value">{{ total_customers }}</div>
+    <div class="t-sub">On file</div>
+  </div>
+  <div class="ticker-cell {{ 'warn' if low_stock|length > 0 }}">
+    <div class="t-label">Low stock</div>
+    <div class="t-value">{{ low_stock|length }}</div>
+    <div class="t-sub">{{ 'Needs restocking' if low_stock|length > 0 else 'All healthy' }}</div>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:22px;">
+  <div class="card">
+    <div class="card-head">
+      <h3>Revenue — last 14 days</h3>
+      <span class="muted num">৳ BDT</span>
+    </div>
+    <div class="card-body">
+      <div class="chart-box">
+        <canvas id="chart-trend" data-labels='{{ trend_labels|tojson }}' data-values='{{ trend_values|tojson }}'></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Stock value by category</h3>
+    </div>
+    <div class="card-body">
+      {% if cat_labels|length > 0 %}
+      <div class="chart-box" style="height:190px;">
+        <canvas id="chart-category-value" data-labels='{{ cat_labels|tojson }}' data-values='{{ cat_values|tojson }}'></canvas>
+      </div>
+      <div class="legend-row">
+        {% set palette = ['var(--gold)', 'var(--teal)', '#e2635a', '#9b8cd8', '#7bc67e', '#e0a76f'] %}
+        {% for label in cat_labels %}
+          <span><span class="sw" style="background:{{ palette[loop.index0 % palette|length] }};"></span>{{ label }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:30px 10px;">
+        <p>No stock value to chart yet.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:22px;">
+  <div class="card">
+    <div class="card-head">
+      <h3>Low stock watchlist</h3>
+      <a class="link-more" href="{{ url_for('products', status='low') }}">View all →</a>
+    </div>
+    {% if low_stock|length > 0 %}
+    <div class="table-wrap">
+      <table class="ledger">
+        <thead><tr><th>Product</th><th>Category</th><th class="num">On hand</th><th class="num">Minimum</th><th></th></tr></thead>
+        <tbody>
+          {% for p in low_stock %}
+          <tr>
+            <td class="row-title">{{ p.name }}</td>
+            <td class="muted">{{ p.category_name or '—' }}</td>
+            <td class="num">{{ p.quantity }}</td>
+            <td class="num muted">{{ p.minimum_stock }}</td>
+            <td><span class="badge {{ 'badge-danger' if p.quantity <= 0 else 'badge-warn' }}">{{ 'Out' if p.quantity <= 0 else 'Low' }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="mark"><span></span><span></span><span></span><span></span><span></span></div>
+      <h4>Stock levels are healthy</h4>
+      <p>Nothing is below its minimum threshold right now.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Top selling products</h3>
+    </div>
+    <div class="card-body">
+      {% if top_product_labels|length > 0 %}
+      <div class="chart-box">
+        <canvas id="chart-top-products" data-labels='{{ top_product_labels|tojson }}' data-values='{{ top_product_values|tojson }}'></canvas>
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:30px 10px;">
+        <p>Record a sale to see your bestsellers here.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="section-head">
+  <h2>Recent sales</h2>
+  <a class="link-more" href="{{ url_for('sales') }}">View all →</a>
+</div>
+<div class="card">
+  {% if recent_sales|length > 0 %}
+  <div class="table-wrap">
+    <table class="ledger">
+      <thead><tr><th>Sale</th><th>Customer</th><th>Date</th><th class="num">Total</th></tr></thead>
+      <tbody>
+        {% for s in recent_sales %}
+        <tr>
+          <td class="row-title"><a href="{{ url_for('sales_invoice', sale_id=s.id) }}">#{{ s.id }}</a></td>
+          <td>{{ s.customer_name or 'Walk-in' }}</td>
+          <td class="muted">{{ s.sale_date }}</td>
+          <td class="num">৳{{ "{:,.2f}".format(s.total_amount) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="mark"><span></span><span></span><span></span><span></span><span></span></div>
+    <h4>No sales recorded yet</h4>
+    <p>Your first sale will show up here.</p>
+    <a class="btn btn-primary" href="{{ url_for('create_sale') }}">Record a sale</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
