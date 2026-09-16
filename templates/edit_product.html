@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% set active_page = 'products' %}
+{% block title %}Edit product{% endblock %}
+{% block page_title %}Edit product{% endblock %}
+{% block page_sub %}<p>{{ product.name }}</p>{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:720px;">
+  <div class="card-body">
+    <form method="POST">
+      <div class="form-grid">
+        <div class="field" style="grid-column:1 / -1;">
+          <label for="name">Product name</label>
+          <input type="text" id="name" name="name" value="{{ product.name }}" required autofocus>
+        </div>
+
+        <div class="field">
+          <label for="category_id">Category</label>
+          <select id="category_id" name="category_id">
+            <option value="">Uncategorized</option>
+            {% for c in categories %}
+            <option value="{{ c.id }}" {{ 'selected' if product.category_id == c.id }}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="supplier">Supplier</label>
+          <input list="supplier-list" id="supplier" name="supplier" value="{{ product.supplier or '' }}">
+          <datalist id="supplier-list">
+            {% for s in suppliers %}<option value="{{ s.name }}">{% endfor %}
+          </datalist>
+        </div>
+
+        <div class="field">
+          <label for="purchase_price">Purchase price <span class="hint">৳ cost per unit</span></label>
+          <input class="input-money" type="number" step="0.01" min="0" id="purchase_price" name="purchase_price" value="{{ product.purchase_price }}" required>
+        </div>
+
+        <div class="field">
+          <label for="selling_price">Selling price <span class="hint">৳ per unit</span></label>
+          <input class="input-money" type="number" step="0.01" min="0" id="selling_price" name="selling_price" value="{{ product.selling_price }}" required>
+        </div>
+
+        <div class="field">
+          <label>Current stock <span class="hint">use Stock Ledger to adjust</span></label>
+          <input class="input-money" type="text" value="{{ product.quantity }} units" disabled style="opacity:0.6;">
+        </div>
+
+        <div class="field">
+          <label for="minimum_stock">Minimum stock</label>
+          <input class="input-money" type="number" step="1" min="0" id="minimum_stock" name="minimum_stock" value="{{ product.minimum_stock }}" required>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a class="btn btn-ghost" href="{{ url_for('products') }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

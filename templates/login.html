@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in · {{ app_name }}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230c1512'/%3E%3Crect x='8' y='20' width='4' height='12' rx='1.5' fill='%23d6a84b'/%3E%3Crect x='14.5' y='14' width='4' height='18' rx='1.5' fill='%23eec378'/%3E%3Crect x='21' y='8' width='4' height='24' rx='1.5' fill='%23d6a84b'/%3E%3Crect x='27.5' y='16' width='4' height='16' rx='1.5' fill='%23eec378'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-shell">
+  <div class="login-side">
+    <div class="content-z">
+      <div class="brand" style="color:#f3f7f4;">
+        <span class="mark"><span></span><span></span><span></span><span></span><span></span></span>
+        <span>{{ app_name }}<small style="color:#8ba69b;">Inventory &amp; Sales</small></span>
+      </div>
+    </div>
+    <div class="content-z">
+      <p class="login-quote">Every unit counted, every sale <span>ledgered</span>, every taka accounted for — stock and revenue in one clear view.</p>
+      <div class="login-tickerbars">
+        <i style="height:38%"></i><i style="height:62%"></i><i style="height:44%"></i>
+        <i style="height:80%"></i><i style="height:56%"></i><i style="height:95%"></i>
+        <i style="height:70%"></i><i style="height:50%"></i><i style="height:66%"></i>
+        <i style="height:30%"></i><i style="height:85%"></i><i style="height:48%"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-main">
+    <div class="login-box">
+      <div class="brand">
+        <span class="mark"><span></span><span></span><span></span><span></span><span></span></span>
+        <span>{{ app_name }}</span>
+      </div>
+      <p class="lead">Sign in to open the ledger.</p>
+
+      {% if error %}
+        <div class="error-box">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="admin" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign in →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

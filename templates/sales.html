@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% set active_page = 'sales' %}
+{% block title %}Sales{% endblock %}
+{% block page_title %}Sales{% endblock %}
+{% block page_sub %}<p>{{ sales|length }} sale{{ 's' if sales|length != 1 }} recorded</p>{% endblock %}
+
+{% block content %}
+<div class="section-head" style="margin-top:0;">
+  <h2>Sales log</h2>
+  <div class="flex gap-10">
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('export_sales') }}">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+      Export CSV
+    </a>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('create_sale') }}">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      New sale
+    </a>
+  </div>
+</div>
+
+<form class="filters-row" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search by customer… (live)" style="min-width:240px;" data-live-search="#salesTable">
+  <button class="btn btn-outline btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('sales') }}">Clear</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if sales|length > 0 %}
+  <div class="table-wrap">
+    <table class="ledger" id="salesTable">
+      <thead><tr><th>Sale</th><th>Customer</th><th>Date</th><th class="num">Total</th><th></th></tr></thead>
+      <tbody>
+        {% for s in sales %}
+        <tr>
+          <td class="row-title">#{{ s.id }}</td>
+          <td>{{ s.customer_name or 'Walk-in' }}</td>
+          <td class="muted">{{ s.sale_date }}</td>
+          <td class="num">৳{{ "{:,.2f}".format(s.total_amount) }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-outline btn-sm" href="{{ url_for('sales_invoice', sale_id=s.id) }}">View invoice</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="mark"><span></span><span></span><span></span><span></span><span></span></div>
+    <h4>No sales yet</h4>
+    <p>Record your first sale to see it here.</p>
+    <a class="btn btn-primary" href="{{ url_for('create_sale') }}">New sale</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

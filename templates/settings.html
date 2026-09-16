@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% set active_page = 'settings' %}
+{% block title %}Account settings{% endblock %}
+{% block page_title %}Account settings{% endblock %}
+{% block page_sub %}<p>Update the username and password used to sign in.</p>{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:640px;">
+  <div class="card-body">
+    <form method="POST" autocomplete="off">
+      <div class="field">
+        <label for="new_username">Username</label>
+        <input type="text" id="new_username" name="new_username" value="{{ user.username }}" required autofocus>
+      </div>
+
+      <div class="field">
+        <label for="new_password">New password</label>
+        <input type="password" id="new_password" name="new_password" placeholder="Leave blank to keep current password" autocomplete="new-password">
+      </div>
+
+      <div class="field">
+        <label for="confirm_password">Confirm new password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat new password" autocomplete="new-password">
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+
+      <div class="field">
+        <label for="current_password">Current password</label>
+        <input type="password" id="current_password" name="current_password" placeholder="Required to save any change" required autocomplete="current-password">
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
